@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>건강 MBTI 테스트</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { text-align: center; }
+    fieldset { margin-bottom: 20px; padding: 10px; }
+    .result { border: 2px solid #4CAF50; padding: 15px; margin-top: 20px; display: none; }
+    .result h2 { margin-top: 0; }
+    .btn { display: inline-block; padding: 10px 20px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>건강 MBTI 테스트</h1>
+  <form id="mbtiForm">
+    <fieldset>
+      <legend>🔋 에너지 & 피로 (E / I)</legend>
+      <label><input type="checkbox" name="e1"> 평소 자주 피곤하거나 에너지가 부족하다고 느끼나요?</label><br>
+      <label><input type="checkbox" name="e2"> 잠을 자도 개운하지 않거나 숙면이 어렵나요?</label><br>
+      <label><input type="checkbox" name="e3"> 폐·호흡기가 약해 쉽게 지치시나요?</label><br>
+      <label><input type="checkbox" name="e4"> 과로 후 피로가 오래가고 간 건강이 걱정되시나요?</label>
+    </fieldset>
+    <fieldset>
+      <legend>🌙 스트레스 & 수면 (S / N)</legend>
+      <label><input type="checkbox" name="s1"> 평소 스트레스를 자주 받고 예민함을 느끼시나요?</label><br>
+      <label><input type="checkbox" name="s2"> 수면 시간이 충분해도 자주 깨거나 숙면이 잘 안 되나요?</label><br>
+      <label><input type="checkbox" name="s3"> 가슴이 두근거리거나 심박이 빨라지는 일이 잦나요?</label><br>
+      <label><input type="checkbox" name="s4"> 특정 음식·계절·환경에서 알레르기 반응이 심하게 나타나나요?</label>
+    </fieldset>
+    <fieldset>
+      <legend>🍎 영양 & 소화 (T / F)</legend>
+      <label><input type="checkbox" name="t1"> 소화가 잘 안 되거나 속이 자주 더부룩하신가요?</label><br>
+      <label><input type="checkbox" name="t2"> 식습관이 불규칙하거나 편식을 많이 하는 편인가요?</label><br>
+      <label><input type="checkbox" name="t3"> 체중 관리가 어렵거나 살이 쉽게 찌는 편인가요?</label><br>
+      <label><input type="checkbox" name="t4"> 식후 속 쓰림, 트림, 복부 통증 등을 자주 겪나요?</label>
+    </fieldset>
+    <fieldset>
+      <legend>💪 신체 & 면역 (P / J)</legend>
+      <label><input type="checkbox" name="p1"> 피부가 건조해지거나 트러블이 자주 생기시나요?</label><br>
+      <label><input type="checkbox" name="p2"> 감기·알레르기 등 잔병치레가 잦은 편인가요?</label><br>
+      <label><input type="checkbox" name="p3"> 평소 운동을 잘 안 해서 근력이 약하다고 느끼시나요?</label><br>
+      <label><input type="checkbox" name="p4"> 개인 맞춤형 건강 관리가 꼭 필요하다고 느끼시나요?</label>
+    </fieldset>
+    <button type="button" class="btn" onclick="calculateMBTI()">결과 확인</button>
+  </form>
+
+  <div id="result" class="result"></div>
+
+  <script>
+    const descriptions = {
+      ESTP: { title: '극한직업 피로왕 🥵', theme: '피로 회복·에너지 충전', issues: '심장·혈관·뇌 / 간 / 장·면역', advice: '짧은 스트레칭·산책으로 몸 풀어주기' },
+      ESTJ: { title: '완벽주의 피로쟁이 📚', theme: '규칙적 휴식·스트레스 완화', issues: '두뇌 건강 / 장·면역', advice: '완벽보다 충분한 휴식 우선' },
+      ESFP: { title: '예민피부 활력제로 🎨', theme: '피부 진정·스트레스 완화', issues: '피부 / 개인맞춤', advice: '마스크 팩+가벼운 산책' },
+      ESFJ: { title: '책임감 과다 지친 리더 💔', theme: '면역력 강화·피로 회복', issues: '장·면역 / 피부', advice: '5분 컨디션 체크 루틴' },
+      ENTP: { title: '피곤한 두뇌 천재 🤯', theme: '두뇌 휴식·두피 강화', issues: '두뇌 / 두피', advice: '목·어깨 스트레칭' },
+      ENTJ: { title: '스트레스 폭발 리더 🦁', theme: '심혈관 안정·스트레스 해소', issues: '심장·뇌', advice: '3분 명상·호흡법' },
+      ENFP: { title: '몽상하는 만성피로러 ☁️', theme: '에너지 충전·영양 밸런스', issues: '장·면역 / 체지방', advice: '꿀물+스트레칭' },
+      ENFJ: { title: '지친 열정주의자 🔥', theme: '소화 개선·피부 케어', issues: '장·면역 / 피부', advice: '나만의 힐링 타임' },
+      ISTP: { title: '무심한 건강 방관자 🙈', theme: '건강 체크 경각심', issues: '두피 / 장·면역', advice: '체크리스트 관리' },
+      ISTJ: { title: '꼼꼼한 건강 체크러 📋', theme: '면역·피부 관리', issues: '장·면역 / 피부', advice: '건강 일기 1줄' },
+      ISFP: { title: '속으로 병드는 감성러 🎭', theme: '소화 편안·스트레스 리셋', issues: '장·면역 / 피부', advice: '산책+차 한 잔' },
+      ISFJ: { title: '소심한 건강 관리러 🛡️', theme: '두뇌 회복·면역 강화', issues: '두뇌 / 장·면역', advice: '비타민 알람' },
+      INTP: { title: '두뇌형 운동 부족자 🧠', theme: '근력 강화·두뇌 이완', issues: '근육 / 두뇌', advice: '2분 스트레칭 루틴' },
+      INTJ: { title: '계획뿐인 건강 엘리트 📅', theme: '관절 보호·장 건강', issues: '뼈·관절 / 장·면역', advice: '5분 운동' },
+      INFP: { title: '스트레스 취약 감성가 🌌', theme: '수면 질 개선·피부 진정', issues: '피부 / 장·면역', advice: '명상+수분 섭취' },
+      INFJ: { title: '건강 완벽주의자 🌟', theme: '개인 맞춤·피부 유지', issues: '개인맞춤 / 피부', advice: '지속 가능한 습관' }
+    };
+    function calculateMBTI() {
+      const form = document.getElementById('mbtiForm');
+      const data = new FormData(form);
+      const count = (prefix) => ['1','2','3','4'].reduce((sum, i) => sum + (data.get(prefix+i) ? 1 : 0), 0);
+      const EI = count('e') >= 2 ? 'E' : 'I';
+      const SN = count('s') >= 2 ? 'N' : 'S';
+      const TF = count('t') >= 2 ? 'T' : 'F';
+      const PJ = count('p') >= 2 ? 'J' : 'P';
+      const code = EI+SN+TF+PJ;
+      const res = descriptions[code];
+      const div = document.getElementById('result');
+      div.innerHTML = `<h2>${code} 『${res.title}』</h2>
+                       <p>💡 건강테마 포인트: ${res.theme}</p>
+                       <p>⚠️ 문제된 테마: ${res.issues}</p>
+                       <p>🗒️ 한마디 조언: ${res.advice}</p>`;
+      div.style.display = 'block';
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+  </script>
+</body>
+</html>
